@@ -13,27 +13,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.siidm.ui.theme.SIIDMTheme
 import com.example.siidm.data.network.SessionManager
+import android.app.Application
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        SessionManager.init(applicationContext)
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SIIDMTheme {
-        Greeting("Android")
+class SIIDM : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        // Inicializar el gestor de sesión con el contexto de la aplicación
+        SessionManager.init(this)
     }
 }

@@ -1,20 +1,19 @@
-package com.example.siidm.ui.areas
+package com.example.siidm.ui.config
 
 import android.Manifest
-import android.bluetooth.BluetoothDevice
-import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.ArrayAdapter
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
-import com.example.siidm.databinding.ActivityLabConfigBinding
-import com.example.siidm.ui.reports.ReportActivity
+import com.example.siidm.data.model.ConfigSensor
+import kotlin.text.get
 
 class LabConfigActivity : AppCompatActivity() {
 
@@ -71,22 +70,22 @@ class LabConfigActivity : AppCompatActivity() {
         updateTiempoLabel(10)
 
         binding.seekBarSensibilidad.setOnSeekBarChangeListener(
-            object : android.widget.SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(sb: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
+            object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
                     updateSensibilidadLabel(progress)
                 }
-                override fun onStartTrackingTouch(sb: android.widget.SeekBar?) {}
-                override fun onStopTrackingTouch(sb: android.widget.SeekBar?) {}
+                override fun onStartTrackingTouch(sb: SeekBar?) {}
+                override fun onStopTrackingTouch(sb: SeekBar?) {}
             }
         )
 
         binding.seekBarTiempo.setOnSeekBarChangeListener(
-            object : android.widget.SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(sb: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
+            object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
                     updateTiempoLabel(progress + 1)
                 }
-                override fun onStartTrackingTouch(sb: android.widget.SeekBar?) {}
-                override fun onStopTrackingTouch(sb: android.widget.SeekBar?) {}
+                override fun onStartTrackingTouch(sb: SeekBar?) {}
+                override fun onStopTrackingTouch(sb: SeekBar?) {}
             }
         )
     }
@@ -175,7 +174,7 @@ class LabConfigActivity : AppCompatActivity() {
         }
     }
 
-    private fun buildConfig() = com.example.siidm.data.model.ConfigSensor(
+    private fun buildConfig() = ConfigSensor(
         labId = labId,
         sensibilidad = binding.seekBarSensibilidad.progress + 1,
         tiempoEspera = binding.seekBarTiempo.progress + 1,
@@ -199,7 +198,7 @@ class LabConfigActivity : AppCompatActivity() {
     }
 
     private fun requestBluetoothPermissions() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             permissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.BLUETOOTH_CONNECT,
