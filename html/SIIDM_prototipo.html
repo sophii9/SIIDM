@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SIIDM — Panel de Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #0a0e1a;
+    --surface:   #111827;
+    --card:      #151f30;
+    --border:    #1e2d45;
+    --accent:    #f5c842;
+    --accent2:   #3b82f6;
+    --on:        #22c55e;
+    --off:       #ef4444;
+    --text:      #e8edf5;
+    --muted:     #64748b;
+    --glow:      rgba(245,200,66,.18);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND GRID ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(245,200,66,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,200,66,.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── TOPBAR ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,14,26,.85);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.25rem;
+    display: flex; align-items: center; gap: .6rem;
+  }
+  .logo-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:.5; transform:scale(.7); }
+  }
+  .header-right {
+    display: flex; align-items: center; gap: 1.2rem;
+  }
+  .badge {
+    font-size: .7rem; font-weight: 600; letter-spacing: .08em;
+    padding: .25rem .7rem; border-radius: 99px;
+    background: rgba(245,200,66,.12); color: var(--accent);
+    border: 1px solid rgba(245,200,66,.3);
+  }
+  .clock {
+    font-family: 'Syne', sans-serif; font-size: .85rem;
+    color: var(--muted);
+  }
+
+  /* ── LAYOUT ── */
+  .wrapper {
+    position: relative; z-index: 1;
+    max-width: 1200px; margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  /* ── PAGE TITLE ── */
+  .page-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: .3rem;
+  }
+  .page-sub {
+    color: var(--muted); font-size: .9rem; margin-bottom: 2rem;
+  }
+  .page-sub span { color: var(--accent); }
+
+  /* ── STATS ROW ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem; margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.4rem;
+    display: flex; flex-direction: column; gap: .4rem;
+    transition: border-color .25s, box-shadow .25s;
+  }
+  .stat-card:hover {
+    border-color: rgba(245,200,66,.4);
+    box-shadow: 0 0 20px rgba(245,200,66,.07);
+  }
+  .stat-label {
+    font-size: .72rem; font-weight: 600; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .stat-value {
+    font-family: 'Syne', sans-serif; font-size: 1.7rem; font-weight: 700;
+  }
+  .stat-value.green { color: var(--on); }
+  .stat-value.yellow { color: var(--accent); }
+  .stat-value.blue { color: var(--accent2); }
+  .stat-sub { font-size: .75rem; color: var(--muted); }
+
+  /* ── MAIN GRID ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+  }
+  @media (max-width: 860px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-head {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: .8rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: .6rem;
+  }
+  .section-head::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── ROOM CARDS ── */
+  .rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+  .room-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.4rem;
+    cursor: pointer;
+    transition: all .3s ease;
+    position: relative; overflow: hidden;
+  }
+  .room-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 60% 20%, var(--glow), transparent 70%);
+    opacity: 0; transition: opacity .3s;
+  }
+  .room-card.active::before { opacity: 1; }
+  .room-card.active {
+    border-color: rgba(245,200,66,.45);
+    box-shadow: 0 0 30px rgba(245,200,66,.1);
+  }
+  .room-card:hover { transform: translateY(-2px); }
+
+  .room-icon {
+    font-size: 1.8rem; margin-bottom: .9rem;
+    filter: grayscale(1); transition: filter .3s;
+  }
+  .room-card.active .room-icon { filter: grayscale(0); }
+
+  .room-name {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: .95rem; margin-bottom: .25rem;
+  }
+  .room-zone {
+    font-size: .75rem; color: var(--muted); margin-bottom: 1rem;
+  }
+
+  .room-footer {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .room-status {
+    font-size: .72rem; font-weight: 600; letter-spacing: .06em;
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+  }
+  .dot.on  { background: var(--on);  box-shadow: 0 0 8px var(--on); }
+  .dot.off { background: var(--off); box-shadow: 0 0 8px var(--off); }
+  .dot.mot { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: blink .8s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  /* toggle switch */
+  .toggle {
+    position: relative; width: 44px; height: 24px;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0; border-radius: 99px;
+    background: var(--border); cursor: pointer;
+    transition: background .3s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px; border-radius: 50%;
+    left: 3px; top: 3px;
+    background: var(--muted);
+    transition: transform .3s, background .3s;
+  }
+  .toggle input:checked + .slider { background: rgba(245,200,66,.3); }
+  .toggle input:checked + .slider::before {
+    transform: translateX(20px);
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* ── INTENSITY SLIDER ── */
+  .intensity-wrap {
+    margin-top: 1rem;
+    display: flex; align-items: center; gap: .8rem;
+    font-size: .75rem; color: var(--muted);
+  }
+  input[type=range] {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 4px; border-radius: 99px;
+    background: var(--border); outline: none; cursor: pointer;
+    transition: background .2s;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar { display: flex; flex-direction: column; gap: 1.2rem; }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.4rem;
+  }
+
+  /* sensor live feed */
+  .sensor-list { display: flex; flex-direction: column; gap: .7rem; }
+  .sensor-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: .82rem;
+  }
+  .sensor-name { color: var(--text); }
+  .sensor-val {
+    font-family: 'Syne', sans-serif; font-size: .8rem; font-weight: 700;
+    padding: .2rem .6rem; border-radius: 6px;
+  }
+  .sensor-val.detecting {
+    background: rgba(245,200,66,.15); color: var(--accent);
+  }
+  .sensor-val.clear {
+    background: rgba(100,116,139,.1); color: var(--muted);
+  }
+
+  /* schedule */
+  .schedule-list { display: flex; flex-direction: column; gap: .6rem; }
+  .sched-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: .82rem;
+    background: var(--surface); border-radius: 10px;
+    padding: .6rem .9rem;
+  }
+  .sched-time { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--accent); }
+  .sched-label { color: var(--muted); font-size: .75rem; }
+  .sched-action {
+    font-size: .7rem; font-weight: 600; letter-spacing: .05em;
+    padding: .2rem .55rem; border-radius: 6px;
+  }
+  .sched-action.on  { background: rgba(34,197,94,.15);  color: var(--on);  }
+  .sched-action.off { background: rgba(239,68,68,.15);  color: var(--off); }
+
+  /* consumption chart */
+  .chart-bars {
+    display: flex; align-items: flex-end; gap: 6px;
+    height: 80px; margin-top: .8rem;
+  }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar {
+    width: 100%; border-radius: 4px 4px 0 0;
+    background: var(--border); transition: height .4s ease;
+    position: relative;
+  }
+  .bar.today { background: linear-gradient(to top, var(--accent), rgba(245,200,66,.4)); }
+  .bar-label { font-size: .62rem; color: var(--muted); }
+
+  /* ── QUICK ACTIONS ── */
+  .actions { display: flex; gap: .8rem; flex-wrap: wrap; margin-top: 1.5rem; }
+  .btn {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: .78rem; letter-spacing: .06em;
+    padding: .65rem 1.2rem; border-radius: 10px;
+    border: none; cursor: pointer; transition: all .25s;
+  }
+  .btn-primary {
+    background: var(--accent); color: #0a0e1a;
+  }
+  .btn-primary:hover { box-shadow: 0 0 20px rgba(245,200,66,.4); transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: rgba(245,200,66,.4); color: var(--accent); }
+  .btn-danger {
+    background: rgba(239,68,68,.1); color: var(--off);
+    border: 1px solid rgba(239,68,68,.25);
+  }
+  .btn-danger:hover { background: rgba(239,68,68,.2); }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 2rem; right: 2rem;
+    background: var(--card); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: .9rem 1.4rem; border-radius: 12px;
+    font-size: .82rem; color: var(--text);
+    transform: translateY(6rem); opacity: 0;
+    transition: all .35s cubic-bezier(.4,0,.2,1);
+    z-index: 999; max-width: 280px;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── MODAL ── */
+  .overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,.65); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  .overlay.open { display: flex; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 22px; padding: 2rem;
+    width: min(420px, 92vw); position: relative;
+    animation: modal-in .3s ease;
+  }
+  @keyframes modal-in {
+    from { opacity:0; transform: scale(.94) translateY(12px); }
+    to   { opacity:1; transform: scale(1)  translateY(0); }
+  }
+  .modal h3 {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 1.1rem; margin-bottom: 1.2rem;
+  }
+  .modal-close {
+    position: absolute; top: 1.2rem; right: 1.2rem;
+    background: var(--border); border: none; color: var(--muted);
+    width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+    font-size: 1rem; display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+  }
+  .modal-close:hover { background: var(--off); color: #fff; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-label {
+    display: block; font-size: .75rem; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: .4rem;
+  }
+  .form-input, .form-select {
+    width: 100%; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: .88rem; padding: .6rem .9rem; outline: none;
+    transition: border-color .2s;
+  }
+  .form-input:focus, .form-select:focus {
+    border-color: rgba(245,200,66,.5);
+  }
+
+  /* ── SENSITIVITY DIAL ── */
+  .dial-row {
+    display: flex; gap: .5rem; margin-top: .4rem;
+  }
+  .dial-btn {
+    flex: 1; padding: .5rem; border-radius: 8px; border: none;
+    cursor: pointer; font-family: 'Syne', sans-serif; font-size: .75rem;
+    font-weight: 700; transition: all .2s;
+    background: var(--surface); color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .dial-btn.active {
+    background: rgba(245,200,66,.15); color: var(--accent);
+    border-color: rgba(245,200,66,.5);
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    SIIDM
+  </div>
+  <div class="header-right">
+    <span class="badge">UTNC — Docencia 1</span>
+    <span class="clock" id="clock">--:--:--</span>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="wrapper">
+  <p class="page-title">Panel de Control</p>
+  <p class="page-sub">Edificio de Docencia 1 &nbsp;·&nbsp; <span id="date-str">Cargando...</span></p>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <span class="stat-label">Aulas activas</span>
+      <span class="stat-value green" id="stat-active">3</span>
+      <span class="stat-sub">de 8 aulas totales</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Movimiento detectado</span>
+      <span class="stat-value yellow" id="stat-motion">2</span>
+      <span class="stat-sub">sensores activos ahora</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Consumo actual</span>
+      <span class="stat-value blue" id="stat-kwh">1.42 kW</span>
+      <span class="stat-sub">↓ 38% vs ayer</span> <!-- variables de cálculo para mostrar porcentaje de ahorro o aumento respecto al día anterior -->
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Ahorro del mes</span>
+      <span class="stat-value yellow">$342</span>
+      <span class="stat-sub">MXN estimados</span>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- LEFT: ROOMS -->
+    <div>
+      <p class="section-head">Aulas</p>
+      <div class="rooms-grid" id="rooms-grid"></div>
+
+      <div class="actions">
+        <button class="btn btn-primary" onclick="allOn()">Encender todo</button>
+        <button class="btn btn-danger"  onclick="allOff()">Apagar todo</button>
+        <button class="btn btn-ghost"   onclick="openSchedule()">+ Horario</button>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+      <!-- SENSOR FEED -->
+      <div class="panel">
+        <p class="section-head">Sensores PIR en vivo</p>
+        <div class="sensor-list" id="sensor-list"></div>
+      </div>
+
+      <!-- CONSUMPTION CHART -->
+      <div class="panel">
+        <p class="section-head">Consumo semanal (kWh)</p>
+        <div class="chart-bars" id="chart-bars"></div>
+      </div>
+
+      <!-- SCHEDULE -->
+      <div class="panel">
+        <p class="section-head">Horarios programados</p>
+        <div class="schedule-list" id="schedule-list"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Configurar aula -->
+<div class="overlay" id="modal-room">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-room')">✕</button>
+    <h3 id="modal-title">Configurar aula</h3>
+
+    <div class="form-group">
+      <label class="form-label">Intensidad de luz</label>
+      <div class="intensity-wrap" style="margin-top:.4rem">
+        <span>0%</span>
+        <input type="range" id="modal-intensity" min="0" max="100" value="80"
+               oninput="document.getElementById('modal-int-val').textContent=this.value+'%'"/>
+        <span id="modal-int-val">80%</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Tiempo de encendido (min)</label>
+      <input type="number" class="form-input" id="modal-time" value="5" min="1" max="60"/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Sensibilidad del sensor</label>
+      <div class="dial-row">
+        <button class="dial-btn" onclick="setSens(this,'Baja')">Baja</button>
+        <button class="dial-btn active" onclick="setSens(this,'Media')">Media</button>
+        <button class="dial-btn" onclick="setSens(this,'Alta')">Alta</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Modo</label>
+      <select class="form-select" id="modal-mode">
+        <option value="auto">Automático (PIR)</option>
+        <option value="manual">Manual</option>
+        <option value="schedule">Por horario</option>
+        <option value="off">Apagado forzado</option>
+      </select>
+    </div>
+
+    <div style="display:flex;gap:.8rem;margin-top:1.2rem">
+      <button class="btn btn-primary" style="flex:1" onclick="saveRoom()">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-room')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Agregar horario -->
+<div class="overlay" id="modal-schedule">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-schedule')">✕</button>
+    <h3>Nuevo Horario</h3>
+
+    <div class="form-group">
+      <label class="form-label">Aula</label>
+      <select class="form-select" id="sched-aula"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Hora</label>
+      <input type="time" class="form-input" id="sched-hora" value="07:00"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Acción</label>
+      <select class="form-select" id="sched-accion">
+        <option value="on">Encender</option>
+        <option value="off">Apagar</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:.8rem;margin-top:1.2rem">
+      <button class="btn btn-primary" style="flex:1" onclick="addSchedule()">Agregar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-schedule')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const rooms = [
+  { id:1, name:'Aula 101', zone:'Planta Baja', icon:'🏫', on:true,  motion:true,  intensity:100 },
+  { id:2, name:'Aula 102', zone:'Planta Baja', icon:'🏫', on:true,  motion:false, intensity:80  },
+  { id:3, name:'Lab. Cómputo', zone:'Planta Baja', icon:'💻', on:true, motion:true, intensity:90 },
+  { id:4, name:'Aula 201', zone:'Primer Piso', icon:'🏫', on:false, motion:false, intensity:60  },
+  { id:5, name:'Aula 202', zone:'Primer Piso', icon:'🏫', on:false, motion:false, intensity:70  },
+  { id:6, name:'Sala Maestros', zone:'Primer Piso', icon:'👨‍🏫', on:false, motion:false, intensity:80 },
+  { id:7, name:'Aula 301', zone:'Segundo Piso', icon:'🏫', on:false, motion:false, intensity:100 },
+  { id:8, name:'Sala Reuniones', zone:'Segundo Piso', icon:'🤝', on:false, motion:false, intensity:75 },
+];
+
+const schedules = [
+  { hora:'07:00', aula:'Aula 101',       accion:'on'  },
+  { hora:'07:00', aula:'Lab. Cómputo',   accion:'on'  },
+  { hora:'21:00', aula:'Todas',          accion:'off' },
+];
+
+const weekData = [3.8, 4.1, 2.9, 3.5, 4.4, 2.1, 1.4]; //variables de consumo por día para mostrar en la gráfica semanal (en kWh)
+const weekDays = ['L','M','M','J','V','S','D']; // etiquetas para los días de la semana en la gráfica
+
+let editingRoom = null; // variable para almacenar el aula que se está editando en el modal
+
+// ─── CLOCK ──────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('es-MX', { hour12: false });
+  document.getElementById('date-str').textContent =
+    now.toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── RENDER ROOMS ────────────────────────────────────────────────────────────
+function renderRooms() {
+  const grid = document.getElementById('rooms-grid');
+  grid.innerHTML = rooms.map(r => `
+    <div class="room-card ${r.on ? 'active' : ''}" id="room-${r.id}" onclick="openRoom(${r.id})">
+      <div class="room-icon">${r.icon}</div>
+      <div class="room-name">${r.name}</div>
+      <div class="room-zone">${r.zone}</div>
+      <div class="room-footer">
+        <div class="room-status">
+          <span class="dot ${r.motion ? 'mot' : r.on ? 'on' : 'off'}"></span>
+          ${r.motion ? 'Movimiento' : r.on ? 'Encendida' : 'Apagada'}
+        </div>
+        <label class="toggle" onclick="event.stopPropagation()">
+          <input type="checkbox" ${r.on ? 'checked' : ''}
+                 onchange="toggleRoom(${r.id}, this.checked)"/>
+          <span class="slider"></span>
+        </label>
+      </div>
+      ${r.on ? `
+        <div class="intensity-wrap" onclick="event.stopPropagation()">
+          <span>💡</span>
+          <input type="range" min="0" max="100" value="${r.intensity}"
+                 oninput="setIntensity(${r.id}, this.value)"/>
+          <span>${r.intensity}%</span>
+        </div>` : ''}
+    </div>
+  `).join('');
+  updateStats();
+}
+
+// ─── RENDER SENSORS ──────────────────────────────────────────────────────────
+function renderSensors() {
+  const list = document.getElementById('sensor-list');
+  list.innerHTML = rooms.map(r => `
+    <div class="sensor-row">
+      <span class="sensor-name">${r.name}</span>
+      <span class="sensor-val ${r.motion ? 'detecting' : 'clear'}">
+        ${r.motion ? '● Detectando' : '○ Despejado'}
+      </span>
+    </div>
+  `).join('');
+}
+
+// ─── RENDER CHART ────────────────────────────────────────────────────────────
+function renderChart() {
+  const max = Math.max(...weekData);
+  const bars = document.getElementById('chart-bars');
+  bars.innerHTML = weekData.map((v, i) => `
+    <div class="bar-wrap">
+      <div class="bar ${i===6?'today':''}"
+           style="height:${(v/max)*70}px"
+           title="${v} kWh"></div>
+      <span class="bar-label">${weekDays[i]}</span>
+    </div>
+  `).join('');
+}
+
+// ─── RENDER SCHEDULES ────────────────────────────────────────────────────────
+function renderSchedules() {
+  const list = document.getElementById('schedule-list');
+  list.innerHTML = schedules.map(s => `
+    <div class="sched-row">
+      <span class="sched-time">${s.hora}</span>
+      <span class="sched-label">${s.aula}</span>
+      <span class="sched-action ${s.accion}">${s.accion === 'on' ? 'ENCENDER' : 'APAGAR'}</span>
+    </div>
+  `).join('');
+}
+
+// ─── STATS ───────────────────────────────────────────────────────────────────
+function updateStats() {
+  const active = rooms.filter(r => r.on).length;
+  const motions = rooms.filter(r => r.motion).length;
+  document.getElementById('stat-active').textContent = active;
+  document.getElementById('stat-motion').textContent = motions;
+  const kw = (rooms.filter(r=>r.on).reduce((s,r)=> s + r.intensity, 0) * 0.018).toFixed(2);
+  document.getElementById('stat-kwh').textContent = kw + ' kW';
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+function toggleRoom(id, state) {
+  const r = rooms.find(r => r.id === id);
+  r.on = state;
+  if (!state) r.motion = false;
+  renderRooms();
+  renderSensors();
+  toast(`${r.name} ${state ? 'encendida ✓' : 'apagada'}`);
+}
+
+function setIntensity(id, val) {
+  const r = rooms.find(r => r.id === id);
+  r.intensity = parseInt(val);
+  updateStats();
+}
+
+function allOn() {
+  rooms.forEach(r => r.on = true);
+  renderRooms(); renderSensors();
+  toast('Todas las aulas encendidas ✓');
+}
+
+function allOff() {
+  rooms.forEach(r => { r.on = false; r.motion = false; });
+  renderRooms(); renderSensors();
+  toast('Todas las aulas apagadas');
+}
+
+// ─── MODAL ROOM ──────────────────────────────────────────────────────────────
+function openRoom(id) {
+  editingRoom = id;
+  const r = rooms.find(r => r.id === id);
+  document.getElementById('modal-title').textContent = 'Configurar — ' + r.name;
+  document.getElementById('modal-intensity').value = r.intensity;
+  document.getElementById('modal-int-val').textContent = r.intensity + '%';
+  document.getElementById('modal-room').classList.add('open');
+}
+
+function saveRoom() {
+  const r = rooms.find(r => r.id === editingRoom);
+  r.intensity = parseInt(document.getElementById('modal-intensity').value);
+  const mode = document.getElementById('modal-mode').value;
+  if (mode === 'off') { r.on = false; r.motion = false; }
+  else if (mode === 'manual') r.on = true;
+  renderRooms(); renderSensors();
+  closeModal('modal-room');
+  toast('Configuración guardada ✓');
+}
+
+// ─── MODAL SCHEDULE ──────────────────────────────────────────────────────────
+function openSchedule() {
+  const sel = document.getElementById('sched-aula');
+  sel.innerHTML = ['Todas', ...rooms.map(r=>r.name)].map(n=>`<option>${n}</option>`).join('');
+  document.getElementById('modal-schedule').classList.add('open');
+}
+
+function addSchedule() {
+  const hora  = document.getElementById('sched-hora').value;
+  const aula  = document.getElementById('sched-aula').value;
+  const accion= document.getElementById('sched-accion').value;
+  schedules.push({ hora, aula, accion });
+  schedules.sort((a,b) => a.hora.localeCompare(b.hora));
+  renderSchedules();
+  closeModal('modal-schedule');
+  toast('Horario agregado ✓');
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function setSens(btn, val) {
+  btn.closest('.dial-row').querySelectorAll('.dial-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ─── SIMULATE MOTION ────────────────────────────────────────────────────────
+setInterval(() => {
+  rooms.forEach(r => {
+    if (r.on && Math.random() < .15) {
+      r.motion = !r.motion;
+    }
+  });
+  renderSensors();
+  updateStats();
+}, 4000);
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+renderRooms();
+renderSensors();
+renderChart();
+renderSchedules();
+</script>
+</body>
+</html>
