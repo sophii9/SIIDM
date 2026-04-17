@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.docencia1.app">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Permisos de Internet para conexión a servidor local -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -25,11 +25,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.Docencia1">
+        android:theme="@style/Theme.SIIDM">
 
         <!-- Login -->
         <activity
-            android:name=".ui.auth.LoginActivity"
+            android:name="com.example.siidm.ui.auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,13 +38,13 @@
         </activity>
 
         <!-- Pantalla principal de áreas -->
-        <activity android:name=".ui.areas.AreasActivity" android:exported="false"/>
+        <activity android:name="com.example.siidm.ui.areas.AreasActivity" android:exported="false"/>
 
         <!-- Configuración de laboratorio -->
-        <activity android:name=".ui.config.LabConfigActivity" android:exported="false"/>
+        <activity android:name="com.example.siidm.ui.config.LabConfigActivity" android:exported="false"/>
 
         <!-- Informe de consumo -->
-        <activity android:name=".ui.reports.ReportActivity" android:exported="false"/>
+        <activity android:name="com.example.siidm.ui.reports.ReportActivity" android:exported="false"/>
 
     </application>
 

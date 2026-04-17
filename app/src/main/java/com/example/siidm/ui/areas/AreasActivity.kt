@@ -13,6 +13,8 @@ import com.example.siidm.databinding.ActivityAreasBinding
 import com.example.siidm.ui.auth.LoginActivity
 import com.example.siidm.ui.config.LabConfigActivity
 import com.example.siidm.ui.areas.LaboratorioAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
+
 
 class AreasActivity : AppCompatActivity() {
 
@@ -52,7 +54,7 @@ class AreasActivity : AppCompatActivity() {
         }
 
         binding.rvLaboratorios.apply {
-            layoutManager = LinearLayoutManager(this)
+            layoutManager = LinearLayoutManager(this@AreasActivity)
             this.adapter = adapter
         }
     }
