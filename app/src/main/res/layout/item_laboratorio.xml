@@ -71,7 +71,7 @@
                 android:layout_height="20dp"
                 android:src="@android:drawable/ic_media_next"
                 android:contentDescription="Configurar"
-                android:tint="#BBBBBB" />
+                app:tint="#BBBBBB" />
 
         </LinearLayout>
 

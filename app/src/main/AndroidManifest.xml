@@ -28,7 +28,7 @@
 
         <!-- Login -->
         <activity
-            android:name=".ui.auth.LoginActivity"
+            android:name="com.example.siidm.ui.auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,13 +37,13 @@
         </activity>
 
         <!-- Pantalla principal de áreas -->
-        <activity android:name=".ui.areas.AreasActivity" android:exported="false"/>
+        <activity android:name="com.example.siidm.ui.areas.AreasActivity" android:exported="false"/>
 
         <!-- Configuración de laboratorio -->
-        <activity android:name=".ui.config.LabConfigActivity" android:exported="false"/>
+        <activity android:name="com.example.siidm.ui.config.LabConfigActivity" android:exported="false"/>
 
         <!-- Informe de consumo -->
-        <activity android:name=".ui.reports.ReportActivity" android:exported="false"/>
+        <activity android:name="com.example.siidm.ui.reports.ReportActivity" android:exported="false"/>
 
     </application>
 

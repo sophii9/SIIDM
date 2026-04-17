@@ -1,7 +1,7 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose") // Add this
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose) // This replaces the old compiler extension
 }
 
 android {
@@ -29,16 +29,13 @@ android {
         viewBinding = true
     }
 
-    composeOptions {
-    }
-
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-                targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 
@@ -70,7 +67,7 @@ dependencies {
 
     // MPAndroidChart para gráficas de consumo
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation(libs.play.services.cast.framework)
+    //implementation(libs.play.services.cast.framework)
 
     // Testing
     testImplementation ("junit:junit:4.13.2")
