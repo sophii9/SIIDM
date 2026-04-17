@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.docencia1.app">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Permisos de Internet para conexión a servidor local -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -25,7 +24,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.Docencia1">
+        android:theme="@style/Theme.SIIDM">
 
         <!-- Login -->
         <activity

@@ -1,14 +1,15 @@
 plugins {
-    id ("com.android.application")
-    id ("org.jetbrains.kotlin.android")
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose") // Add this
 }
 
 android {
-    namespace = "com.docencia1.app"
+    namespace = "com.SIIDM.app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.docencia1.app"
+        applicationId = "com.SIIDM.app"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -29,7 +30,6 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
     }
 
     compileOptions {
